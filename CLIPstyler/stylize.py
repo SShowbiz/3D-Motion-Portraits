@@ -1,5 +1,6 @@
 from PIL import Image
 
+import os
 import torch
 import torch.nn
 import torch.optim as optim
@@ -197,7 +198,9 @@ for epoch in tqdm(range(0, steps + 1)):
     #     print("TV loss: ", reg_tv.item())
 
     if epoch % 50 == 0:
-        out_path = content_name + "_" + prompt.replace(" ", "_") + ".jpg"
+        if not os.path.exists("output_images"):
+            os.makedirs("output_images")
+        out_path = "output_images/" + content_name + "_" + prompt.replace(" ", "_") + ".jpg"
         output_image = target.clone()
         output_image = torch.clamp(output_image, 0, 1)
         output_image = adjust_contrast(output_image, 1.5)
