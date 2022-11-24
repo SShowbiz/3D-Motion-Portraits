@@ -3,6 +3,7 @@ import torch
 import torch.nn
 import torch.optim as optim
 from torchvision import transforms, models
+import numpy as np
 
 import StyleNet
 import utils
@@ -74,8 +75,12 @@ def compose_text_with_templates(text: str, templates=imagenet_templates) -> list
 
 content_path = args.content_path
 mask_path = args.mask_path
-content_image = utils.load_image2(content_path)
-mask_image = utils.load_image2(mask_path)
+
+h, w = np.array(Image.open(mask_path)).shape
+
+content_image = utils.load_image2(content_path, img_height=(h // 8) * 8, img_width=(w // 8) * 8)
+mask_image = utils.load_image2(mask_path, img_height=(h // 8) * 8, img_width=(w // 8) * 8)
+
 content_name = content_path.split(".")[-2].split("/")[-1]
 
 content_image = content_image.to(device)
