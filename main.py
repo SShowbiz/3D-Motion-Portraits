@@ -1,9 +1,5 @@
-# from CLIPstyler.config import add_all_arguments as add_stylize_arguments
-# from Moments3D.config import add_all_arguments as add_momentize_arguments
 from CLIPstyler.stylize import stylize
 from Moments3D.momentize import render as momentize
-
-import argparse
 import configargparse
 
 
