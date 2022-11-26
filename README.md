@@ -13,10 +13,10 @@ python main.py --content_path demo_images/yuqi.png --mask_path demo_images/mask_
 ### Example Result
 
 #### Content Input Image
-[content](demo_images/yuqi.png)
+<img src="demo_images/yuqi.png" width=300>
 
 #### Mask Input Image
-[mask](demo_images/mask_yuqi.png)
+<img src="demo_images/mask_yuqi.png" width=300>
 
-#### Video
-[video](output_videos/yuqi_zoom_in.gif)
+#### Stylized Video (Text: Cherry Blossom)
+<img src="output_videos/yuqi_zoom_in.gif" width=300>
