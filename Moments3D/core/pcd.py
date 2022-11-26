@@ -14,8 +14,9 @@
 
 
 import sys
-sys.path.append('../')
-import config
+
+sys.path.append("../")
+from .. import config
 import numpy as np
 import torch
 import torch.nn as nn
@@ -79,7 +80,7 @@ class PointsRenderer(nn.Module):
 
 
 def linear_interpolation(data0, data1, time):
-    return (1. - time) * data0 + time * data1
+    return (1.0 - time) * data0 + time * data1
 
 
 def create_pcd_renderer(h, w, intrinsics, R=None, T=None, radius=None, device="cuda"):
@@ -90,13 +91,15 @@ def create_pcd_renderer(h, w, intrinsics, R=None, T=None, radius=None, device="c
         R = torch.eye(3)[None]  # (1, 3, 3)
     if T is None:
         T = torch.zeros(1, 3)  # (1, 3)
-    cameras = PerspectiveCameras(R=R, T=T,
-                                 device=device,
-                                 focal_length=((-fx, -fy),),
-                                 principal_point=(tuple(intrinsics[:2, -1]),),
-                                 image_size=((h, w),),
-                                 in_ndc=False,
-                                 )
+    cameras = PerspectiveCameras(
+        R=R,
+        T=T,
+        device=device,
+        focal_length=((-fx, -fy),),
+        principal_point=(tuple(intrinsics[:2, -1]),),
+        image_size=((h, w),),
+        in_ndc=False,
+    )
 
     # Define the settings for rasterization and shading. Here we set the output image to be of size
     # 512x512. As we are rendering images for visualization purposes only we will set faces_per_pixel=1
@@ -117,8 +120,5 @@ def create_pcd_renderer(h, w, intrinsics, R=None, T=None, radius=None, device="c
     # Create a points renderer by compositing points using an alpha compositor (nearer points
     # are weighted more heavily). See [1] for an explanation.
     rasterizer = PointsRasterizer(cameras=cameras, raster_settings=raster_settings)
-    renderer = PointsRenderer(
-        rasterizer=rasterizer,
-        compositor=AlphaCompositor()
-    )
+    renderer = PointsRenderer(rasterizer=rasterizer, compositor=AlphaCompositor())
     return renderer

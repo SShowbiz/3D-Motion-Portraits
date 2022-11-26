@@ -17,9 +17,9 @@ import os
 import imageio
 import torch.utils.data.distributed
 from pytorch3d.structures import Pointclouds
-from core.utils import *
-from core.depth_layering import get_depth_bins
-from core.pcd import linear_interpolation, create_pcd_renderer
+from ..core.utils import *
+from ..core.depth_layering import get_depth_bins
+from ..core.pcd import linear_interpolation, create_pcd_renderer
 
 
 class ImgRenderer:

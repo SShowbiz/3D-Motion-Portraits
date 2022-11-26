@@ -6,17 +6,18 @@ import torch
 import cv2
 import argparse
 
-from third_party.DPT.util import io
+from ...third_party.DPT.util import io
 
 from torchvision.transforms import Compose
 
-from third_party.DPT.dpt.models import DPTDepthModel
-from third_party.DPT.dpt.midas_net import MidasNet_large
-from third_party.DPT.dpt.transforms import Resize, NormalizeImage, PrepareForNet
+from ...third_party.DPT.dpt.models import DPTDepthModel
+from ...third_party.DPT.dpt.midas_net import MidasNet_large
+from ...third_party.DPT.dpt.transforms import Resize, NormalizeImage, PrepareForNet
 
 
-def run_dpt(input_path, output_path, model_path, model_type="dpt_hybrid", optimize=True,
-            absolute_depth=False, kitti_crop=False):
+def run_dpt(
+    input_path, output_path, model_path, model_type="dpt_hybrid", optimize=True, absolute_depth=False, kitti_crop=False
+):
     """Run MonoDepthNN to compute depth maps.
 
     Args:
@@ -81,14 +82,12 @@ def run_dpt(input_path, output_path, model_path, model_type="dpt_hybrid", optimi
         net_w = net_h = 384
 
         model = MidasNet_large(model_path, non_negative=True)
-        normalization = NormalizeImage(
-            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-        )
+        normalization = NormalizeImage(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     else:
-        assert (
-            False
-        ), f"model_type '{model_type}' not implemented, use: " \
-           f"--model_type [dpt_large|dpt_hybrid|dpt_hybrid_kitti|dpt_hybrid_nyu|midas_v21]"
+        assert False, (
+            f"model_type '{model_type}' not implemented, use: "
+            f"--model_type [dpt_large|dpt_hybrid|dpt_hybrid_kitti|dpt_hybrid_nyu|midas_v21]"
+        )
 
     transform = Compose(
         [
@@ -121,7 +120,7 @@ def run_dpt(input_path, output_path, model_path, model_type="dpt_hybrid", optimi
     # create output folder
     os.makedirs(output_path, exist_ok=True)
 
-    print('=========================computing DPT depth maps...=========================')
+    print("=========================computing DPT depth maps...=========================")
     for ind, img_name in enumerate(img_names):
         if os.path.isdir(img_name):
             continue
@@ -135,7 +134,7 @@ def run_dpt(input_path, output_path, model_path, model_type="dpt_hybrid", optimi
             height, width, _ = img.shape
             top = height - 352
             left = (width - 1216) // 2
-            img = img[top: top + 352, left: left + 1216, :]
+            img = img[top : top + 352, left : left + 1216, :]
 
         img_input = transform({"image": img})["image"]
 
@@ -166,9 +165,7 @@ def run_dpt(input_path, output_path, model_path, model_type="dpt_hybrid", optimi
             if model_type == "dpt_hybrid_nyu":
                 prediction *= 1000.0
 
-        filename = os.path.join(
-            output_path, os.path.splitext(os.path.basename(img_name))[0]
-        )
+        filename = os.path.join(output_path, os.path.splitext(os.path.basename(img_name))[0])
         io.write_depth(filename, prediction, bits=2, absolute_depth=absolute_depth)
 
     print("finished")
@@ -177,9 +174,7 @@ def run_dpt(input_path, output_path, model_path, model_type="dpt_hybrid", optimi
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
-        "-i", "--input_path", default="input", help="folder with input images"
-    )
+    parser.add_argument("-i", "--input_path", default="input", help="folder with input images")
 
     parser.add_argument(
         "-o",
@@ -188,9 +183,7 @@ if __name__ == "__main__":
         help="folder for output images",
     )
 
-    parser.add_argument(
-        "-m", "--model_weights", default=None, help="path to model weights"
-    )
+    parser.add_argument("-m", "--model_weights", default=None, help="path to model weights")
 
     parser.add_argument(
         "-t",
@@ -234,5 +227,5 @@ if __name__ == "__main__":
         args.model_type,
         args.optimize,
         args.absolute_depth,
-        args.kitti_crop
+        args.kitti_crop,
     )

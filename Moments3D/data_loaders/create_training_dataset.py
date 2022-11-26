@@ -102,17 +102,17 @@ def create_training_dataset(args):
     # otherwise only one dataset is used
     # args.dataset_weights should be a list representing the resampling rate for each dataset, and should sum up to 1
 
-    print('training dataset: {}'.format(args.train_dataset))
-    mode = 'train'
-    if '+' not in args.train_dataset:
+    print("training dataset: {}".format(args.train_dataset))
+    mode = "train"
+    if "+" not in args.train_dataset:
         train_dataset = dataset_dict[args.train_dataset](args, mode)
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset) if args.distributed else None
     else:
-        train_dataset_names = args.train_dataset.split('+')
+        train_dataset_names = args.train_dataset.split("+")
         weights = args.dataset_weights
         assert len(train_dataset_names) == len(weights)
-        assert np.abs(np.sum(weights) - 1.) < 1e-6
-        print('weights:{}'.format(weights))
+        assert np.abs(np.sum(weights) - 1.0) < 1e-6
+        print("weights:{}".format(weights))
         train_datasets = []
         train_weights_samples = []
         for training_dataset_name, weight in zip(train_dataset_names, weights):
@@ -120,7 +120,7 @@ def create_training_dataset(args):
             train_datasets.append(train_dataset)
             num_samples = len(train_dataset)
             weight_each_sample = weight / num_samples
-            train_weights_samples.extend([weight_each_sample]*num_samples)
+            train_weights_samples.extend([weight_each_sample] * num_samples)
 
         train_dataset = torch.utils.data.ConcatDataset(train_datasets)
         train_weights = torch.from_numpy(np.array(train_weights_samples))

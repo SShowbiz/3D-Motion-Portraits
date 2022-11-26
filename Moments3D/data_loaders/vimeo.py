@@ -19,9 +19,9 @@ import numpy as np
 import torch
 import glob
 from torch.utils.data import Dataset
-from data_loaders.data_utils import get_src_tgt_ids, resize_img
+from .data_utils import get_src_tgt_ids, resize_img
 import torchvision
-from core.utils import remove_noise_in_dpt_disparity
+from ..core.utils import remove_noise_in_dpt_disparity
 
 
 def get_black_boundary_size(img):

@@ -1,11 +1,11 @@
 # Copyright 2022 Google LLC
-#
+
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+
 #     https://www.apache.org/licenses/LICENSE-2.0
-#
+
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,21 +16,20 @@ import glob
 import time
 import imageio
 import cv2
-
-import config
+from . import config
 import torchvision
 import torch.utils.data.distributed
 from tqdm import tqdm
-from model import get_raft_model
-from third_party.RAFT.core.utils.utils import InputPadder
-from third_party.DPT.run_monodepth import run_dpt
-from utils import *
-from model import SpaceTimeModel
-from core.utils import *
-from core.scene_flow import SceneFlowEstimator
-from core.renderer import ImgRenderer
-from core.inpainter import Inpainter
-from data_loaders.data_utils import resize_img
+from .model import get_raft_model
+from .third_party.RAFT.core.utils.utils import InputPadder
+from .third_party.DPT.run_monodepth import run_dpt
+from .utils import *
+from .model import SpaceTimeModel
+from .core.utils import *
+from .core.scene_flow import SceneFlowEstimator
+from .core.renderer import ImgRenderer
+from .core.inpainter import Inpainter
+from .data_loaders.data_utils import resize_img
 from PIL import ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -76,7 +75,7 @@ def homography_warp_pairs(args):
     warped_dpt_out_dir = os.path.join(warped_out_dir, "dpt_depth")
     os.makedirs(warped_dpt_out_dir, exist_ok=True)
 
-    dpt_model_path = "third_party/DPT/weights/dpt_hybrid-midas-501f0c75.pt"
+    dpt_model_path = "Moments3D/third_party/DPT/weights/dpt_hybrid-midas-501f0c75.pt"
     run_dpt(input_path=input_dir, output_path=dpt_out_dir, model_path=dpt_model_path, optimize=False)
     disp_files = sorted(glob.glob(os.path.join(dpt_out_dir, "*.png")))
 
@@ -227,30 +226,32 @@ def render(args):
         ]
         crop = 32
 
-        for j, T in enumerate(Ts):
-            T = torch.from_numpy(T).float().to(renderer.device)
-            time_steps = np.linspace(0, 1, num_frames[j])
-            frames = []
-            for i, t_step in tqdm(
-                enumerate(time_steps),
-                total=len(time_steps),
-                desc="generating video of {} camera trajectory".format(video_paths[j]),
-            ):
-                pred_img, _, meta = renderer.render_pcd(
-                    pts1, pts2, rgb1, rgb2, feat1, feat2, mask, side_ids, t=T[i], time=t_step
-                )
-                frame = (255.0 * pred_img.detach().cpu().squeeze().permute(1, 2, 0).numpy()).astype(np.uint8)
-                # mask out fuzzy image boundaries due to no outpainting
-                img_boundary_mask = (meta["acc"] > 0.5).detach().cpu().squeeze().numpy().astype(np.uint8)
-                img_boundary_mask_cleaned = process_boundary_mask(img_boundary_mask)
-                frame = frame * img_boundary_mask_cleaned[..., None]
-                frame = frame[crop:-crop, crop:-crop]
-                frames.append(frame)
+        video_path = video_paths[args.video_path]
+        T = Ts[args.video_path]
 
-            video_out_file = os.path.join(
-                video_out_folder, "{}_{}-{}-{}.mp4".format(video_paths[j], scene_id, frame_id1, frame_id2)
+        T = torch.from_numpy(T).float().to(renderer.device)
+        time_steps = np.linspace(0, 1, num_frames[args.video_path])
+        frames = []
+        for i, t_step in tqdm(
+            enumerate(time_steps),
+            total=len(time_steps),
+            desc="generating video of {} camera trajectory".format(video_path),
+        ):
+            pred_img, _, meta = renderer.render_pcd(
+                pts1, pts2, rgb1, rgb2, feat1, feat2, mask, side_ids, t=T[i], time=t_step
             )
-            imageio.mimwrite(video_out_file, frames, fps=25, quality=8)
+            frame = (255.0 * pred_img.detach().cpu().squeeze().permute(1, 2, 0).numpy()).astype(np.uint8)
+            # mask out fuzzy image boundaries due to no outpainting
+            img_boundary_mask = (meta["acc"] > 0.5).detach().cpu().squeeze().numpy().astype(np.uint8)
+            img_boundary_mask_cleaned = process_boundary_mask(img_boundary_mask)
+            frame = frame * img_boundary_mask_cleaned[..., None]
+            frame = frame[crop:-crop, crop:-crop]
+            frames.append(frame)
+
+        video_out_file = os.path.join(
+            video_out_folder, "{}_{}-{}-{}.mp4".format(video_path, scene_id, frame_id1, frame_id2)
+        )
+        imageio.mimwrite(video_out_file, frames, fps=25, quality=8)
 
         print("space-time videos have been saved in {}.".format(video_out_folder))
 

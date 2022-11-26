@@ -15,14 +15,13 @@
 
 import os
 import torch
-from networks.resunet import ResUNet
-from networks.img_decoder import ImgDecoder
-from third_party.RAFT.core.raft import RAFT
-from utils import de_parallel
+from .networks.resunet import ResUNet
+from .networks.img_decoder import ImgDecoder
+from .third_party.RAFT.core.raft import RAFT
+from .utils import de_parallel
 
 
 class Namespace:
-
     def __init__(self, **kwargs):
         for name in kwargs:
             setattr(self, name, kwargs[name])
@@ -38,10 +37,10 @@ class Namespace:
 
 def get_raft_model(args):
     flow_args = Namespace()
-    setattr(flow_args, 'model', 'third_party/RAFT/models/raft-things.pth')
-    setattr(flow_args, 'small', False)
-    setattr(flow_args, 'mixed_precision', False)
-    setattr(flow_args, 'alternate_corr', False)
+    setattr(flow_args, "model", "Moments3D/third_party/RAFT/models/raft-things.pth")
+    setattr(flow_args, "small", False)
+    setattr(flow_args, "mixed_precision", False)
+    setattr(flow_args, "alternate_corr", False)
 
     device = "cuda:{}".format(args.local_rank)
     if args.distributed:
@@ -54,7 +53,7 @@ def get_raft_model(args):
     else:
         model = torch.nn.DataParallel(RAFT(flow_args)).to(device)
 
-    model.load_state_dict(torch.load(flow_args.model, map_location='cuda:{}'.format(args.local_rank)))
+    model.load_state_dict(torch.load(flow_args.model, map_location="cuda:{}".format(args.local_rank)))
     return model
 
 
@@ -68,7 +67,7 @@ class SpaceTimeModel(object):
         self.args = args
         load_opt = not args.no_load_opt
         load_scheduler = not args.no_load_scheduler
-        device = torch.device('cuda:{}'.format(args.local_rank))
+        device = torch.device("cuda:{}".format(args.local_rank))
 
         # initialize feature extraction network
         feat_in_ch = 4
@@ -94,22 +93,27 @@ class SpaceTimeModel(object):
 
         self.learnable_params = learnable_params
         if args.train_raft:
-            self.optimizer = torch.optim.Adam([
-                {'params': learnable_params},
-                {'params': filter(lambda p: p.requires_grad, self.raft.parameters()), 'lr': self.args.lr_raft}],
-                lr=args.lr, weight_decay=1e-4, betas=(0.9, 0.999))
+            self.optimizer = torch.optim.Adam(
+                [
+                    {"params": learnable_params},
+                    {"params": filter(lambda p: p.requires_grad, self.raft.parameters()), "lr": self.args.lr_raft},
+                ],
+                lr=args.lr_moments,
+                weight_decay=1e-4,
+                betas=(0.9, 0.999),
+            )
         else:
             self.raft.eval()
-            self.optimizer = torch.optim.Adam(learnable_params, lr=args.lr, weight_decay=1e-4, betas=(0.9, 0.999))
+            self.optimizer = torch.optim.Adam(
+                learnable_params, lr=args.lr_moments, weight_decay=1e-4, betas=(0.9, 0.999)
+            )
 
-        self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer,
-                                                         step_size=args.lrate_decay_steps,
-                                                         gamma=args.lrate_decay_factor)
+        self.scheduler = torch.optim.lr_scheduler.StepLR(
+            self.optimizer, step_size=args.lrate_decay_steps, gamma=args.lrate_decay_factor
+        )
 
-        out_folder = os.path.join(args.rootdir, 'out', args.expname)
-        self.start_step = self.load_from_ckpt(out_folder,
-                                              load_opt=load_opt,
-                                              load_scheduler=load_scheduler)
+        out_folder = os.path.join(args.rootdir, "out", args.expname)
+        self.start_step = self.load_from_ckpt(out_folder, load_opt=load_opt, load_scheduler=load_scheduler)
 
         if args.distributed:
             self.feature_net = torch.nn.parallel.DistributedDataParallel(
@@ -136,45 +140,42 @@ class SpaceTimeModel(object):
             self.raft.train()
 
     def save_model(self, filename):
-        to_save = {'optimizer': self.optimizer.state_dict(),
-                   'scheduler': self.scheduler.state_dict(),
-                   'feature_net': de_parallel(self.feature_net).state_dict(),
-                   'img_decoder': de_parallel(self.img_decoder).state_dict(),
-                   'raft': self.raft.state_dict()
-                   }
+        to_save = {
+            "optimizer": self.optimizer.state_dict(),
+            "scheduler": self.scheduler.state_dict(),
+            "feature_net": de_parallel(self.feature_net).state_dict(),
+            "img_decoder": de_parallel(self.img_decoder).state_dict(),
+            "raft": self.raft.state_dict(),
+        }
         torch.save(to_save, filename)
 
     def load_model(self, filename, load_opt=True, load_scheduler=True):
         if self.args.distributed:
-            to_load = torch.load(filename, map_location='cuda:{}'.format(self.args.local_rank))
+            to_load = torch.load(filename, map_location="cuda:{}".format(self.args.local_rank))
         else:
             to_load = torch.load(filename)
 
         if load_opt:
-            self.optimizer.load_state_dict(to_load['optimizer'])
+            self.optimizer.load_state_dict(to_load["optimizer"])
         if load_scheduler:
-            self.scheduler.load_state_dict(to_load['scheduler'])
+            self.scheduler.load_state_dict(to_load["scheduler"])
 
-        self.feature_net.load_state_dict(to_load['feature_net'])
-        self.img_decoder.load_state_dict(to_load['img_decoder'])
-        if 'raft' in to_load.keys():
-            self.raft.load_state_dict(to_load['raft'])
+        self.feature_net.load_state_dict(to_load["feature_net"])
+        self.img_decoder.load_state_dict(to_load["img_decoder"])
+        if "raft" in to_load.keys():
+            self.raft.load_state_dict(to_load["raft"])
 
-    def load_from_ckpt(self, out_folder,
-                       load_opt=True,
-                       load_scheduler=True,
-                       force_latest_ckpt=False):
-        '''
+    def load_from_ckpt(self, out_folder, load_opt=True, load_scheduler=True, force_latest_ckpt=False):
+        """
         load model from existing checkpoints and return the current step
         :param out_folder: the directory that stores ckpts
         :return: the current starting step
-        '''
+        """
 
         # all existing ckpts
         ckpts = []
         if os.path.exists(out_folder):
-            ckpts = [os.path.join(out_folder, f)
-                     for f in sorted(os.listdir(out_folder)) if f.endswith('.pth')]
+            ckpts = [os.path.join(out_folder, f) for f in sorted(os.listdir(out_folder)) if f.endswith(".pth")]
 
         if self.args.ckpt_path is not None and not force_latest_ckpt:
             if os.path.isfile(self.args.ckpt_path):  # load the specified ckpt
@@ -184,11 +185,9 @@ class SpaceTimeModel(object):
             fpath = ckpts[-1]
             self.load_model(fpath, load_opt, load_scheduler)
             step = int(fpath[-10:-4])
-            print('Reloading from {}, starting at step={}'.format(fpath, step))
+            print("Reloading from {}, starting at step={}".format(fpath, step))
         else:
-            print('No ckpts found, training from scratch...')
+            print("No ckpts found, training from scratch...")
             step = 0
 
         return step
-
-

@@ -11,4 +11,4 @@ adaptive_pts_radius = True
 train_raft = False
 visualize_rgbda_layers = False
 
-ckpt_path = pretrained/model_250000.pth
+ckpt_path = Moments3D/pretrained/model_250000.pth
