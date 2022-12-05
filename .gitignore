@@ -138,4 +138,10 @@ __pycache__
 *.pth
 *.pt
 .DS_Store
+*.gz
+run_brainpp.py
+weights/
+ffhq/
+cat/
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,pycharm
