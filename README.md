@@ -55,13 +55,23 @@ $ python run.py --input_dir='../yuqi/yuqi_cherry_blossom1.png' --output_dir='../
 
 ### Example Result
 
-#### Content Input Image
-<img src="demo_images/yuqi.png" width=300>
-
-#### Mask Input Image
-<img src="demo_images/mask_yuqi.png" width=300>
+#### Content & Mask Input Image
+<p align="center">
+    <img src="demo_images/yuqi.png" width=300>
+    <img src="demo_images/mask_yuqi.png" width=300>
+</p>
 
 #### Stylize + Momentize Result Video (Text: Cherry Blossom)
-<img src="output_videos/yuqi_zoom_in.gif" width=300>
+<p align="center">
+    <img src="output_videos/yuqi_zoom_in.gif" width=300>
+</p>
 
+### Edit Facial Expression Result 
+
+<p align="center">
+  <img src="output_images/yuqi_cherry_blossom_aligned.jpg" width=300>
+  <img src="output_images/yuqi_cherry_blossom_smile.png" width=300>
+</p>
+
+ 
 
