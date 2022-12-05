@@ -41,7 +41,16 @@ $ ./download.sh
 
 ### Stylize + Momentize Demo
 ```shell
-python main.py --content_path demo_images/yuqi.png --mask_path demo_images/mask_yuqi.png --output_path yuqi --text "cherry blossom"
+$ python main.py --content_path demo_images/yuqi.png --mask_path demo_images/mask_yuqi.png --output_path yuqi --text "cherry blossom"
+```
+
+### Edit Facial Expression Demo
+
+This demo can be run after `Stylize + Momentize Demo`. 
+
+```shell
+$ cd OhMyFace
+$ python run.py --input_dir='../yuqi/yuqi_cherry_blossom1.png' --output_dir='../yuqi/yuqi_cherry_blossom_smile.png' --option_beta=0.15 --option_alpha=2.1 --option_gamma=3 --neutral='face' --target='face with smile'
 ```
 
 ### Example Result
@@ -52,5 +61,7 @@ python main.py --content_path demo_images/yuqi.png --mask_path demo_images/mask_
 #### Mask Input Image
 <img src="demo_images/mask_yuqi.png" width=300>
 
-#### Stylized Video (Text: Cherry Blossom)
+#### Stylize + Momentize Result Video (Text: Cherry Blossom)
 <img src="output_videos/yuqi_zoom_in.gif" width=300>
+
+
