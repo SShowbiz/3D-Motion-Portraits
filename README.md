@@ -7,7 +7,7 @@ This repository environment is based on [Anaconda3](https://www.anaconda.com/pro
 `Method 1`: YML file Installation
 
 ```shell
-conda env create --file environment.yml
+$ conda env create --file environment.yml
 ```
 
 If the above command not work, try to follow `Method 2`
