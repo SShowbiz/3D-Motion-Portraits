@@ -39,6 +39,19 @@ $ cd Moments3D
 $ ./download.sh
 ```
 
+To use pretrained [oh-my-face](https://github.com/P2Oileen/oh-my-face) implementation, use following command.
+
+
+```shell
+$ cd OhMyFace
+$ wget https://drive.google.com/file/d/1efFoGShtZhcd6SCxOPu3AMbKZus478au/view?usp=sharing
+$ tar -zxvf ffhq.tar.gz
+$ mv ffhq src/
+$ wget https://drive.google.com/file/d/1bXhWOnwCTTXTz7T7zJ1iXA717tyj-n3U/view?usp=sharing
+$ tar -zxvf weights-face.tar.gz
+$ mv weights src/
+```
+
 ### Stylize + Momentize Demo
 ```shell
 $ python main.py --content_path demo_images/yuqi.png --mask_path demo_images/mask_yuqi.png --output_path yuqi --text "cherry blossom"
