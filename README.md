@@ -1,6 +1,6 @@
-## Text-Driven 3D Motion Portraits
+# Text-Driven 3D Motion Portraits
 
-### Environment Setup
+## Environment Setup
 
 This repository environment is based on [Anaconda3](https://www.anaconda.com/products/distribution).
 
@@ -30,7 +30,7 @@ $ pip install kornia==0.5.10
 $ pip install git+https://github.com/openai/CLIP.git
 ```
 
-### Download Pretrained Model
+## Download Pretrained Model
 
 To use pretrained [3D-Moments](https://github.com/google-research/3d-moments) implementation, use following command.
 
@@ -52,39 +52,25 @@ $ tar -zxvf weights-face.tar.gz
 $ mv weights src/
 ```
 
-### Stylize + Momentize Demo
+## 3D Motion Portrait Generation Demo
 ```shell
-$ python main.py --content_path demo_images/yuqi.png --mask_path demo_images/mask_yuqi.png --output_path yuqi --text "cherry blossom"
+$ python main.py --content_path demo_images/yuqi.png --mask_path demo_images/mask_yuqi.png --output_path yuqi --text “cherry blossom”
 ```
 
-### Edit Facial Expression Demo
+## Example Result
 
-This demo can be run after `Stylize + Momentize Demo`. 
-
-```shell
-$ cd OhMyFace
-$ python run.py --input_dir='../yuqi/yuqi_cherry_blossom1.png' --output_dir='../yuqi/yuqi_cherry_blossom_smile.png' --option_beta=0.15 --option_alpha=2.1 --option_gamma=3 --neutral='face' --target='face with smile'
-```
-
-### Example Result
-
-#### Content & Mask Input Image
+### Content & Mask Input Image
 <p align="center">
     <img src="demo_images/yuqi.png" width=300>
     <img src="demo_images/mask_yuqi.png" width=300>
 </p>
 
-#### Stylize + Momentize Result Video (Text: Cherry Blossom)
+### 3D Motion Portrait Generation Result Video
+
 <p align="center">
     <img src="output_videos/yuqi_zoom_in.gif" width=300>
 </p>
 
-### Edit Facial Expression Result 
-
-<p align="center">
-  <img src="output_images/yuqi_cherry_blossom_aligned.jpg" width=300>
-  <img src="output_images/yuqi_cherry_blossom_smile.png" width=300>
-</p>
-
- 
+Background Stylization Text: `Cherry Blossom`  
+Facial Expression Text: `face with smile` 
 
