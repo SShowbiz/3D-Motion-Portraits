@@ -1,30 +1,12 @@
-from global_singleimg_infer import global_transfer
-import numpy as np
-import argparse
+from .global_singleimg_infer import global_transfer
 import torch
 import cv2
-import sys
 
-sys.path.append("./global_directions")
-sys.path.append("src")
+def inverse(args):
+    latent = torch.load("tmp_latent.pt")
+    beta = args.beta
+    alpha = args.alpha
 
-parser = argparse.ArgumentParser(description='Process Options.')
-parser.add_argument('--output_dir', default='output.jpg', type=str)
-parser.add_argument('--neutral', default='face', type=str)
-parser.add_argument('--transfer_type', default='Face with smile', type=str)
-parser.add_argument('--data_type', default='face', type=str)
-parser.add_argument('--beta', default=0.15, type=float)
-parser.add_argument('--alpha', default=4.1, type=float)
-args = parser.parse_args()
-
-latent = torch.load("tmp_latent.pt")
-beta = args.beta
-alpha = args.alpha
-
-result = global_transfer(latent.cpu().detach().numpy(), args.data_type, neutral= args.neutral, target = args.transfer_type, beta = beta, alpha = alpha)
-cv2.imwrite("output.jpg",result[:,:,::-1])
-
-# cv2.imwrite("output2.jpg",result[:,:,::-1])
-
-
+    result = global_transfer(latent.cpu().detach().numpy(), args.data_type, neutral= args.neutral, target = args.target, beta = beta, alpha = alpha)
+    cv2.imwrite("output.jpg",result[:,:,::-1])
 

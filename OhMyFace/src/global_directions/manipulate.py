@@ -2,8 +2,12 @@ import pickle
 import numpy as np
 import tensorflow as tf
 
-from dnnlib import tflib
-from global_directions.utils.visualizer import HtmlPageVisualizer
+import sys
+sys.path.append("./global_directions")
+sys.path.append("OhMyFace/src")  
+
+from ..dnnlib import tflib
+from .utils.visualizer import HtmlPageVisualizer
 
 def Vis(bname,suffix,out,rownames=None,colnames=None):
     num_images=out.shape[0]
@@ -35,7 +39,7 @@ def Vis(bname,suffix,out,rownames=None,colnames=None):
 
 
 def LoadData(dataset_name):
-    tmp= 'src/'+dataset_name+'/S'
+    tmp= 'OhMyFace/src/'+dataset_name+'/S'
     with open(tmp, "rb") as fp:   #Pickling
         s_names,all_s=pickle.load(fp)
     dlatents=all_s
@@ -49,7 +53,7 @@ def LoadData(dataset_name):
         else:
             pindexs.append(i)
     
-    tmp='src/' + dataset_name + '/S_mean_std'
+    tmp='OhMyFace/src/' + dataset_name + '/S_mean_std'
     with open(tmp, "rb") as fp:   #Pickling
         m,std=pickle.load( fp)
     
@@ -59,7 +63,8 @@ def LoadData(dataset_name):
 def LoadModel(dataset_name, model_name):
     # Initialize TensorFlow.
     tflib.init_tf()
-    tmp='src/' +dataset_name+ '/' + model_name
+    tmp='OhMyFace/src/' +dataset_name+ '/' + model_name
+    print(tmp)
     with open(tmp, 'rb') as f:
         _, _, Gs = pickle.load(f)
     Gs.print_layers()

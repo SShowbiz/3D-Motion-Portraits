@@ -11,9 +11,9 @@ import torch
 import torchvision.transforms as transforms
 import dlib
 import time
-from align_face import align_func
+from .align_face import align_func
 
-from encoder4editing.models.psp import pSp  # we use the pSp framework to load the e4e encoder.
+from .encoder4editing.models.psp import pSp  # we use the pSp framework to load the e4e encoder.
 
 experiment_type = 'ffhq_encode'
 RESIZE_SIZE = 256
@@ -34,7 +34,7 @@ trans = transforms.Compose([
 # net[0].eval(), net[1].eval()
 # net[0].cuda(), net[1].cuda()
 
-model_path = ['src/weights/e4e_ffhq_encode.pt', None]
+model_path = ['OhMyFace/src/weights/e4e_ffhq_encode.pt', None]
 ckpt = [torch.load(model_path[0], map_location='cpu'), None]
 opts = [ckpt[0]['opts'], None]
 opts[0]['checkpoint_path'] = model_path[0]
@@ -50,7 +50,8 @@ def run_on_batch(inputs, net):
     return images, latents
 
 def get_latent_code(img, data_type, weight_dir):
-    img = align_func(img, data_type, weight_dir).transpose(1, 2, 0) # 1024,1024,3
+    img, img_crop, crop, quad = align_func(img, data_type, weight_dir) 
+    img = img.transpose(1, 2, 0) # 1024,1024,3
     aligned_image = img * 255
 
     img = cv2.resize(img, (RESIZE_SIZE, RESIZE_SIZE))[:,:,::-1] * 255 # 256,256,3
@@ -68,7 +69,7 @@ def get_latent_code(img, data_type, weight_dir):
         latent = latents[0]
         #result_image, latent = images[0], latents[0]
     #result_image = ((result_image.cpu().numpy().transpose(1, 2, 0) + 1) / 2)[:,:,::-1] * 255
-    return latent, aligned_image
+    return latent, aligned_image, img_crop, crop, quad
     
 if __name__ == "__main__":
     img = cv2.imread("example.jpg")

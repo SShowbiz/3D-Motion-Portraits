@@ -3,8 +3,8 @@ import torch
 import clip
 import time
 from PIL import Image
-from global_directions.MapTS import GetBoundary,GetDt
-from global_directions.manipulate import Manipulator
+from .global_directions.MapTS import GetBoundary,GetDt
+from .global_directions.manipulate import Manipulator
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device) 
@@ -12,7 +12,7 @@ M=[]
 M.append(Manipulator(dataset_name='ffhq'))
 #M.append(Manipulator(dataset_name='cat'))
 #fs3=[np.load('./ffhq/fs3.npy'), np.load('./cat/fs3.npy')]
-fs3=[np.load('src/ffhq/fs3.npy'), None]
+fs3=[np.load('OhMyFace/src/ffhq/fs3.npy'), None]
 np.set_printoptions(suppress=True)
 
 def global_transfer(latent, data_type = 'face', neutral = 'face', target = 'face with blue eyes', beta=0.15, alpha=4.1):

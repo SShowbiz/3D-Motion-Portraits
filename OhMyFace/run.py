@@ -1,19 +1,36 @@
 import os
 import argparse
+from .src.global_get_latent import get_latent
+from .src.global_run import inverse
+from .src.rife.inference_img import facial_transfer
+from .src.warp import compute_h_norm, warp_image
+from .src.poisson_image_edit import poisson_edit
+from PIL import Image
+import numpy as np
+import cv2
 
-parser = argparse.ArgumentParser(description='Process Options.')
-parser.add_argument('--input_dir', default='input.jpg', type=str)
-parser.add_argument('--output_dir', default='output.jpg', type=str)
-parser.add_argument('--option_beta', default = 0.15, type=float) #min_value=0.08, max_value=0.3, value=0.15, step=0.01)
-parser.add_argument('--option_alpha', default = 4.1, type=float) #min_value=-10.0, max_value=10.0, value=4.1, step=0.1)
-parser.add_argument('--option_gamma', default = 6, type=int) #min_value=2, max_value=10, value=6, step=1)
-parser.add_argument('--option_data_type', default = 'face', type=str) #['face', 'cat']
-parser.add_argument('--neutral', default = 'face')
-parser.add_argument('--target', default = 'face with smile')
-args = parser.parse_args()
+def edit_facial_expression(args):
+    _, img_crop, crop, quad = get_latent(args)
+    inverse(args)
+    output = facial_transfer(args)
 
-os.system('python3 src/global_get_latent.py --input_dir \'{}\' --data_type \'{}\' --weight_dir src/weights '.format(args.input_dir, args.option_data_type))
-os.system('python3 src/global_run.py --neutral \'{}\' --transfer_type \'{}\' --data_type \'{}\' --beta {} --alpha {}'.format(args.neutral, args.target, args.option_data_type, args.option_beta, args.option_alpha))
-os.system('python3 src/rife/inference_img.py --img output.jpg input_aligned.jpg --gamma {}'.format(args.option_gamma))
-os.system('mv output.jpg {}'.format(args.output_dir))
+    h, w, _ = output.shape
+    H = compute_h_norm(np.array([quad[0], quad[3], quad[2], quad[1]]), np.array([[0, 0], [w, 0], [w, h], [0, h]]))
+    _, igs_merge = warp_image(np.asarray(output), np.asarray(img_crop), H)
+    crop_left, crop_up, crop_right, crop_bottom = crop
 
+    h, w, _ = output.shape
+    input = cv2.imread(args.facial_input_dir)
+    h_input, w_input, _ = input.shape
+
+    source = np.zeros((h_input, w_input, 3))
+    source[crop_up:crop_bottom, crop_left:crop_right, :] = igs_merge
+
+    mask = np.zeros((h_input, w_input))
+    mask[crop_up+130:crop_bottom-90, crop_left+130:crop_right-130] = 1
+
+    poisson_blend_result = poisson_edit(source, input, mask)
+    
+    input_path = args.facial_input_dir
+    output_path = input_path.split('.')[0] + '_face_edit.png'
+    cv2.imwrite(output_path, poisson_blend_result)

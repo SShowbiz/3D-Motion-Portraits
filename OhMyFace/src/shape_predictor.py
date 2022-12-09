@@ -7,6 +7,8 @@ import scipy
 import scipy.ndimage
 import dlib
 from pathlib import Path
+from .warp import compute_h_norm, warp_image
+import cv2
 
 def draw_points(image, lm, r):
     draw = ImageDraw.Draw(image)
@@ -87,7 +89,7 @@ def align_face(img, predictor, data_type):
     # img = draw_points(img, lm_nose, 15)
 
     output_size = 1024 #32*32
-    transform_size = 4096 #64*64
+    transform_size = 1024 #64*64
     enable_padding = False #True
 
     # Shrink.
@@ -107,6 +109,7 @@ def align_face(img, predictor, data_type):
     if crop[2] - crop[0] < img.size[0] or crop[3] - crop[1] < img.size[1]:
         img = img.crop(crop)
         quad -= crop[0:2]
+    img_crop = img.copy()
 
     # Pad.
     pad = (int(np.floor(min(quad[:, 0]))), int(np.floor(min(quad[:, 1]))), int(np.ceil(max(quad[:, 0]))),
@@ -127,7 +130,6 @@ def align_face(img, predictor, data_type):
         quad += pad[:2]
 
     # Transform.
-    
     img = img.transform((transform_size, transform_size), PIL.Image.QUAD, (quad + 0.5).flatten(),
                         PIL.Image.BILINEAR)
     if output_size < transform_size:
@@ -135,4 +137,4 @@ def align_face(img, predictor, data_type):
 
     # Save aligned image.
     imgs.append(img)
-    return imgs
+    return imgs, np.asarray(img_crop), crop, quad + 0.5

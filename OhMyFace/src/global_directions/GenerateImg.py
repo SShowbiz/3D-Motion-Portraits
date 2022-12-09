@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import argparse
-from manipulate import Manipulator
+from .manipulate import Manipulator
 
 from PIL import Image
 #%%

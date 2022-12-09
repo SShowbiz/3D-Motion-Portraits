@@ -4,7 +4,7 @@
 import os
 import pickle
 import numpy as np
-from dnnlib import tflib  
+from ..dnnlib import tflib  
 import tensorflow as tf 
 
 import argparse

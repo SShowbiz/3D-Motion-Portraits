@@ -1,6 +1,6 @@
 
 
-from manipulate import Manipulator
+from .manipulate import Manipulator
 import tensorflow as tf
 import numpy as np 
 import torch

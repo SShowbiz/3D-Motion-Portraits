@@ -6,7 +6,7 @@ import torch
 import clip
 from PIL import Image
 import copy
-from manipulate import Manipulator
+from .manipulate import Manipulator
 import argparse
 
 def GetImgF(out,model,preprocess):
