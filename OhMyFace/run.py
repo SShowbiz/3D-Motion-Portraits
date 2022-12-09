@@ -34,3 +34,5 @@ def edit_facial_expression(args):
     input_path = args.facial_input_dir
     output_path = input_path.split('.')[0] + '_face_edit.png'
     cv2.imwrite(output_path, poisson_blend_result)
+
+    os.system('rm output.jpg input_aligned.jpg')
