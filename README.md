@@ -57,6 +57,20 @@ $ mv weights src/
 $ python main.py --content_path demo_images/yuqi.png --mask_path demo_images/mask_yuqi.png --output_path yuqi_surprised --text 'cherry blossom' --target 'face with smile'
 ```
 
+## Main Parameter Explanation
+
+| Parameter  | Meaning |
+| --- | --- | 
+| `content_path`  | base image path (for 3D Motion Portrait generation)  |
+| `mask_path`  | image mask path (masked region will be stylized using `text` parameter)  | 
+| `output_path` | folder directory for output files generation |
+| `text` | text for masked region stylization |
+| `neutral` | neutral image text description (ex. face, face with hair) |
+| `target` | target text for facial expression (ex. face with smile, face with blonde hair) |
+| `alpha` | Strength of facial expression |
+| `beta` | Stength of disentanglement of facial expression (higher `beta` changes only the given difference between `neutral` and `target`) |
+| `gamma` | Strength of RIFE's sample (higher `gamma` generates more `text` based image) |
+
 ## Example Result
 
 ### Content & Mask Input Image
