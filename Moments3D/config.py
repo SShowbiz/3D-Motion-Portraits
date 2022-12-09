@@ -113,5 +113,9 @@ def add_all_arguments(parser):
     parser.add_argument("--mask_path", type=str, default="./background.jpg", help="Image resolution")
     parser.add_argument("--output_path", type=str, default="output_images", help="output image path")
     parser.add_argument("--text", type=str, default="Fire", help="Image resolution")
+    parser.add_argument('--target', default = 'face with smile')
+    parser.add_argument('--alpha', default = 2.1, type=float)
+    parser.add_argument('--beta', default = 0.15, type=float)
+    parser.add_argument('--gamma', default = 6, type=int)
 
     return parser
