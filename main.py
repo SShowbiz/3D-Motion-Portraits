@@ -1,5 +1,6 @@
 from CLIPstyler.stylize import stylize
 from Moments3D.momentize import render as momentize
+from OhMyFace.run import edit_facial_expression as generate_near_duplicate
 import configargparse
 
 
@@ -89,6 +90,22 @@ def add_all_arguments(parser):
         "--video_path", type=int, default=1, choices=[_ for _ in range(3)], help="video path(ex. zoom-in)"
     )
 
+    parser.add_argument('--facial_input_dir', default='input.jpg', type=str)
+    # parser.add_argument('--facial_output_dir', default='output.jpg', type=str)
+    parser.add_argument('--beta', default = 0.15, type=float) #min_value=0.08, max_value=0.3, value=0.15, step=0.01)
+    parser.add_argument('--alpha', default = 2.1, type=float) #min_value=-10.0, max_value=10.0, value=4.1, step=0.1)
+    parser.add_argument('--gamma', default = 6, type=int) #min_value=2, max_value=10, value=6, step=1)
+    parser.add_argument('--data_type', default = 'face', type=str) #['face', 'cat']
+    parser.add_argument('--neutral', default = 'face')
+    parser.add_argument('--target', default = 'face with smile')
+    parser.add_argument('--weight_dir', default = 'OhMyFace/src/weights')
+
+    parser.add_argument('--img', dest='img', nargs=2, default=['output.jpg', 'input_aligned.jpg'])
+    parser.add_argument('--exp', default=1, type=int)
+    parser.add_argument('--ratio', default=0, type=float, help='inference ratio between two images with 0 - 1 range')
+    parser.add_argument('--rthreshold', default=0.02, type=float, help='returns image when actual ratio falls in given range threshold')
+    parser.add_argument('--rmaxcycles', default=8, type=int, help='limit max number of bisectional cycles')
+    parser.add_argument('--model', dest='modelDir', type=str, default='OhMyFace/src/weights', help='directory with trained model files')
     return parser
 
 
@@ -97,11 +114,14 @@ if __name__ == "__main__":
     parser = add_all_arguments(parser)
 
     args = parser.parse_args()
-    args.num_output = 2  # temporary code for near-duplicated photo
     args.input_dir = args.output_path
 
     # stylize
-    stylize(args)
-
+    output = stylize(args)
+    args.facial_input_dir = output
+    
+    # generate near-duplicated, facial expressed image 
+    generate_near_duplicate(args)
+    
     # momentize
     momentize(args)
