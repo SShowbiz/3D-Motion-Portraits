@@ -24,7 +24,7 @@ $ conda install pytorch3d -c pytorch3d
 
 $ pip install ftfy regex tqdm
 $ pip install imageio opencv-python configargparse scipy
-$ pip install timm scikit-learn gdown imageio-ffmpeg
+$ pip install timm scikit-learn gdown imageio-ffmpeg dlib
 $ pip install kornia==0.5.10
 
 $ pip install git+https://github.com/openai/CLIP.git
