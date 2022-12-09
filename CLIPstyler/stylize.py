@@ -207,14 +207,14 @@ def stylize(args, device=device):
         if epoch % 50 == 0:
             if not os.path.exists(args.output_path):
                 os.makedirs(args.output_path)
-            for idx in range(args.num_output):
-                out_path = args.output_path + "/" + content_name + "_" + prompt.replace(" ", "_") + str(idx + 1) +".png"
-                output_image = target.clone()
-                output_image = torch.clamp(output_image, 0, 1)
-                output_image = adjust_contrast(output_image, 1.5)
-                output_image = output_image + (1 - mask_image) * content_image
-                vutils.save_image(output_image, out_path, nrow=1, normalize=True)
+            out_path = args.output_path + "/" + content_name + "_" + prompt.replace(" ", "_") +".png"
+            output_image = target.clone()
+            output_image = torch.clamp(output_image, 0, 1)
+            output_image = adjust_contrast(output_image, 1.5)
+            output_image = output_image + (1 - mask_image) * content_image
+            vutils.save_image(output_image, out_path, nrow=1, normalize=True)
 
+    return out_path
 
 if __name__ == "__main__":
     args = config.read_arguments()
