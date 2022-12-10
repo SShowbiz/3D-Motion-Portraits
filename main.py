@@ -93,7 +93,7 @@ def add_all_arguments(parser):
     parser.add_argument('--facial_input_dir', default='input.jpg', type=str)
     # parser.add_argument('--facial_output_dir', default='output.jpg', type=str)
     parser.add_argument('--beta', default = 0.15, type=float) #min_value=0.08, max_value=0.3, value=0.15, step=0.01)
-    parser.add_argument('--alpha', default = 2.1, type=float) #min_value=-10.0, max_value=10.0, value=4.1, step=0.1)
+    parser.add_argument('--alpha', default = 1.9, type=float) #min_value=-10.0, max_value=10.0, value=4.1, step=0.1)
     parser.add_argument('--gamma', default = 6, type=int) #min_value=2, max_value=10, value=6, step=1)
     parser.add_argument('--data_type', default = 'face', type=str) #['face', 'cat']
     parser.add_argument('--neutral', default = 'face')
