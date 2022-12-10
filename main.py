@@ -1,6 +1,3 @@
-from CLIPstyler.stylize import stylize
-from Moments3D.momentize import render as momentize
-from OhMyFace.run import edit_facial_expression as generate_near_duplicate
 import configargparse
 
 
@@ -116,12 +113,20 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.input_dir = args.output_path
 
+    # generate mask
+    from AutoMask.auto_mask import auto_mask as generate_mask
+    mask_path = generate_mask(args.content_path)
+    args.mask_path = mask_path
+
     # stylize
+    from CLIPstyler.stylize import stylize
     output = stylize(args)
     args.facial_input_dir = output
     
     # generate near-duplicated, facial expressed image 
+    from OhMyFace.run import edit_facial_expression as generate_near_duplicate
     generate_near_duplicate(args)
-    
+
     # momentize
+    from Moments3D.momentize import render as momentize
     momentize(args)
