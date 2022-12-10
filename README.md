@@ -54,7 +54,7 @@ $ mv weights src/
 
 ## 3D Motion Portrait Generation Demo
 ```shell
-$ python main.py --content_path demo_images/yuqi.png --mask_path demo_images/mask_yuqi.png --output_path yuqi_surprised --text 'cherry blossom' --target 'face with smile'
+$ python main.py --content_path demo_images/yuqi.png --mask_path demo_images/mask_yuqi.png --output_path yuqi --text 'cherry blossom' --target 'face with smile'
 ```
 
 ## Main Parameter Explanation
