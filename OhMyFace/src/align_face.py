@@ -14,18 +14,18 @@ def align_func(img, data_type, weight_dir):
     if data_type == 'face':
         if predictor_face is None:
             predictor_face = dlib.shape_predictor(weight_dir + '/shape_predictor_68_face_landmarks.dat')
-        faces, crop_face, crops, quads = align_face(img, predictor_face, data_type)
+        faces, crop_face, crops, quads, face_polys = align_face(img, predictor_face, data_type)
     else:
         if predictor_cat is None:
             predictor_cat = dlib.shape_predictor(weight_dir + '/shape_predictor_cat.dat')
-        faces, crop_face, crops, quads = align_face(img, predictor_cat, data_type)
+        faces, crop_face, crops, quads, face_polys = align_face(img, predictor_cat, data_type)
     for i,face in enumerate(faces):
         if i > 0:
             break
         face_tensor = torchvision.transforms.ToTensor()(face)
         face = face_tensor.numpy()
         # print(face.shape) (3, 1024, 1024) 0~1 bgr
-        return face, crop_face, crops, quads
+        return face, crop_face, crops, quads, face_polys
 
 if __name__ == "__main__":
     img = cv2.imread("cat.jpg")

@@ -70,8 +70,10 @@ def align_face(img, predictor, data_type):
             mouth_avg = (lm_nose + lm_chin) * 0.5
             eye_to_mouth = mouth_avg - eye_avg
 
+    # Select Tight Face Region
+    face_poly = np.concatenate((lm_chin, lm_eyebrow_right[::-1], lm_eyebrow_left[::-1]))
 
-        # Choose oriented crop rectangle.
+    # Choose oriented crop rectangle.
     x = eye_to_eye - np.flipud(eye_to_mouth) * [-1, 1]
     x /= np.hypot(*x)
     x *= max(np.hypot(*eye_to_eye) * 2.0, np.hypot(*eye_to_mouth) * 1.8)
@@ -99,6 +101,7 @@ def align_face(img, predictor, data_type):
         img = img.resize(rsize, PIL.Image.ANTIALIAS)
         quad /= shrink
         qsize /= shrink
+        face_poly /= shrink
 
     # Crop.
     border = max(int(np.rint(qsize * 0.1)), 3)
@@ -109,6 +112,7 @@ def align_face(img, predictor, data_type):
     if crop[2] - crop[0] < img.size[0] or crop[3] - crop[1] < img.size[1]:
         img = img.crop(crop)
         quad -= crop[0:2]
+        face_poly -= crop[0:2]
     img_crop = img.copy()
 
     # Pad.
@@ -137,4 +141,4 @@ def align_face(img, predictor, data_type):
 
     # Save aligned image.
     imgs.append(img)
-    return imgs, np.asarray(img_crop), crop, quad + 0.5
+    return imgs, np.asarray(img_crop), crop, quad + 0.5, face_poly

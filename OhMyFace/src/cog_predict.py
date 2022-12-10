@@ -50,7 +50,7 @@ def run_on_batch(inputs, net):
     return images, latents
 
 def get_latent_code(img, data_type, weight_dir):
-    img, img_crop, crop, quad = align_func(img, data_type, weight_dir) 
+    img, img_crop, crop, quad, face_poly = align_func(img, data_type, weight_dir) 
     img = img.transpose(1, 2, 0) # 1024,1024,3
     aligned_image = img * 255
 
@@ -69,7 +69,7 @@ def get_latent_code(img, data_type, weight_dir):
         latent = latents[0]
         #result_image, latent = images[0], latents[0]
     #result_image = ((result_image.cpu().numpy().transpose(1, 2, 0) + 1) / 2)[:,:,::-1] * 255
-    return latent, aligned_image, img_crop, crop, quad
+    return latent, aligned_image, img_crop, crop, quad, face_poly
     
 if __name__ == "__main__":
     img = cv2.imread("example.jpg")
